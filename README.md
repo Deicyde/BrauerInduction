@@ -18,7 +18,7 @@ BrauerInduction.character_eq_sum_induced_linear
       V.character =
         ∑ i, ns i • (FDRep.indLin (Hs i) (ψs i)).character
 ```
- 
+
 ## Building 
 
 ```bash
@@ -26,11 +26,24 @@ lake exe cache get
 lake build
 ```
 
+## Comparator check
+
+This repository includes a `leanprover/comparator` harness.
+
+* `Challenge.lean` gives a compact Mathlib-based statement of Brauer induction.
+* `Solution.lean` proves that statement from the main theorem in this project.
+* `comparator.json` permits only `propext`, `Classical.choice`, and `Quot.sound`.
+ 
 ## Acknowledgements
 
-This project was developed with AI assistance, predominantly ChatGPT and
+This project was developed with substantial AI assistance, predominantly ChatGPT and
 occasionally Gemini AI. 
+ 
+ ## Note
 
+This is a personal formalization project. It is made public in the hope that
+parts of it may be useful or interesting to other Lean users.
+ 
 ## References
 
 Joseph Bernstein, *Representations of Finite Groups*, Problem assignment 7.5,
