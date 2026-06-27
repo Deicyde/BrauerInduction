@@ -38,6 +38,32 @@ lemma coindLin_ρ_apply (H : Subgroup G) (ψ : H →* kˣ)
     ((FDRep.coindLin H ψ).ρ g v).1 x = v.1 (x * g) := rfl
 
 /--
+The induced representation attached to a linear character is the finite-dimensional
+representation obtained by applying `Rep.ind` to the underlying one-dimensional
+representation.
+
+This is mainly a definitional sanity check for `FDRep.indLin`.
+-/
+theorem indLin_eq_of_rep_ind
+    {G k : Type u} [Group G] [Finite G] [Field k]
+    (H : Subgroup G) (ψ : H →* kˣ) :
+    FDRep.indLin (k := k) (G := G) H ψ =
+      (let A : Rep k H :=
+          (CategoryTheory.forget₂ (FDRep k H) (Rep k H)).obj
+            (FDRep.ofLinearChar (k := k) ψ)
+       let τind : Rep k G := Rep.ind H.subtype A
+       have h_fin_τ : Module.Finite k τind.V := by
+         letI : Fintype G := Fintype.ofFinite G
+         haveI : Module.Finite k A.V := by
+           change Module.Finite k (FDRep.ofLinearChar (k := k) ψ)
+           infer_instance
+         exact Module.Finite.of_surjective
+           (Representation.Coinvariants.mk _) (Submodule.mkQ_surjective _)
+       haveI : Module.Finite k τind.V := h_fin_τ
+       FDRep.of τind.ρ) := by
+  rfl
+
+/--
 For linear characters, induction and coinduction agree through the general
 finite-group induction/coinduction isomorphism.
 -/
