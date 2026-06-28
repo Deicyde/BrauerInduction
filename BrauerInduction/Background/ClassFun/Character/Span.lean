@@ -93,4 +93,15 @@ theorem character_mem_span_irreducibles_of_eq
   obtain ⟨V, rfl⟩ := h_rep
   exact character_mem_span_irreducibles V
 
+/--
+The virtual character group of `G`: the `ℤ`-span of irreducible characters
+inside the group of `k`-valued class functions.
+-/
+def virtualCharacterSubmodule
+    (k : Type u) [Field k]
+    (G : Type v) [Group G] :
+    Submodule ℤ (ClassFun k G) :=
+  Submodule.span ℤ (ClassFun.irreducibleCharacterSet k G)
+
+
 end ClassFun

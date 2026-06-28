@@ -51,17 +51,29 @@ variable {G : Type u} [Group G] [Fintype G]
 namespace BrauerLinGen
 
 /--
+The finite-dimensional representation induced from the linear character attached
+to a generator of `BrauerSpanLin`.
+-/
+noncomputable def inducedFDRep
+    (i : BrauerLinGen k G) : FDRep k G :=
+  FDRep.indLin i.H i.ψ
+
+/--
 The induced linear character attached to a generator of `BrauerSpanLin`.
 -/
 noncomputable def inducedCharacter
-  (i : BrauerLinGen k G) : ClassFun k G :=
-    ClassFun.character (FDRep.indLin (k := k) i.H i.ψ)
+    (i : BrauerLinGen k G) : ClassFun k G :=
+  ClassFun.character i.inducedFDRep
 
 @[simp] lemma inducedCharacter_apply
     (i : BrauerLinGen k G) (g : G) :
-    BrauerLinGen.inducedCharacter i g
-      =
-    (FDRep.indLin i.H i.ψ).character g := rfl
+    BrauerLinGen.inducedCharacter i g =
+      i.inducedFDRep.character g := rfl
+
+lemma inducedFDRep_character
+    (i : BrauerLinGen k G) :
+    ClassFun.character i.inducedFDRep =
+      BrauerLinGen.inducedCharacter i := rfl
 
 end BrauerLinGen
 
@@ -98,7 +110,7 @@ theorem exists_decomposition_of_mem_BrauerSpanLin
       refine ⟨PUnit, inferInstance,
         (fun _ => (1 : ℤ)), (fun _ => i.H), (fun _ => i.ψ), (fun _ => i.hElem), ?_⟩
       ext g
-      simp [BrauerLinGen.inducedCharacter]
+      simp [BrauerLinGen.inducedCharacter, BrauerLinGen.inducedFDRep]
     · refine ⟨Empty, inferInstance, isEmptyElim, isEmptyElim, isEmptyElim, isEmptyElim, ?_⟩
       simp only [Finset.univ_eq_empty, zsmul_eq_mul, Finset.sum_empty]
     · intro x y _ _ hx hy
