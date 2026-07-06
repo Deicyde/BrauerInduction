@@ -186,7 +186,7 @@ theorem lhs_bridge {G : Type u} [Group G] [Finite G] {k : Type u} [Field k] :
       = (1 : Representation k G k).character := by
   have hρ : (FDRep.ofLinearChar (1 : G →* kˣ)).ρ = (1 : Representation k G k) := by
     apply MonoidHom.ext; intro g; apply LinearMap.ext; intro x
-    show (_root_.FDRep.ofLinearChar (1 : G →* kˣ)).ρ g x = (1 : G →* Module.End k k) g x
+    change (_root_.FDRep.ofLinearChar (1 : G →* kˣ)).ρ g x = (1 : G →* Module.End k k) g x
     simp [Module.End.one_apply]
   exact congrArg Representation.character hρ
 
