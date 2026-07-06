@@ -32,9 +32,9 @@ theorem trivialChar_eq_sum_induced_linear_solvable
       (∀ i, IsSolvable (Hs i)) ∧
         (1 : Representation k G k).character =
           ∑ i, ns i •
-            (Rep.ind (Hs i).subtype
-              (Rep.of ((algebraMap k (Module.End k k)).toMonoidHom.comp
-                ((Units.coeHom k).comp (ψs i))))).ρ.character := by
+            (Representation.ind (Hs i).subtype
+              ((algebraMap k (Module.End k k)).toMonoidHom.comp
+                ((Units.coeHom k).comp (ψs i)))).character := by
   sorry
 
 end BrauerChallenge
