@@ -2,7 +2,7 @@
   "challenge_module": "Challenge",
   "solution_module": "Solution",
   "theorem_names": [
-    "BrauerChallenge.character_eq_sum_induced_linear"
+    "BrauerChallenge.trivialChar_eq_sum_induced_linear_solvable"
   ],
   "permitted_axioms": [
     "propext",

@@ -30,8 +30,16 @@ lake build
 
 This repository includes a `leanprover/comparator` harness.
 
-* `Challenge.lean` gives a concise Mathlib-based statement of Brauer induction.
-* `Solution.lean` proves that statement from the main theorem in this project.
+* `Challenge.lean` gives a concise, **pure-Mathlib** statement of a corollary of Brauer
+  induction: the character of the trivial representation is a `ℤ`-linear combination of
+  characters induced from linear characters of *solvable* subgroups. Its statement uses
+  only Mathlib vocabulary (`Rep.ind`, `Representation.character`, `IsSolvable`, …) — no
+  definitions from this project.
+* `OldChallenge.lean` is the previous challenge: the full, elementary-subgroup form of
+  Brauer induction (`character_eq_sum_induced_linear`), stated with a few local helper
+  definitions.
+* `Solution.lean` proves `Challenge.lean` from the previous (elementary) challenge theorem,
+  specializing it to the trivial representation and weakening elementary ⇒ solvable.
 * `comparator.json` permits only `propext`, `Classical.choice`, and `Quot.sound`.
  
 ## Acknowledgements

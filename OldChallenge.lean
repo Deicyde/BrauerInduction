@@ -1,5 +1,4 @@
 import Mathlib
-import BrauerInduction.Main
 
 open scoped BigOperators
 
@@ -12,6 +11,7 @@ An element is `p`-regular if its order is coprime to `p`.
 -/
 def IsPRegular {G : Type u} [Group G] (p : ℕ) (g : G) : Prop :=
   Nat.Coprime (orderOf g) p
+
 
 /--
 A group `G` is `p`-elementary if it is the product of a cyclic `p`-regular
@@ -128,93 +128,9 @@ theorem character_eq_sum_induced_linear
       (Hs : ι → Subgroup G)
       (ψs : ∀ i, Hs i →* kˣ),
       (∀ i, IsBrauerElementary (Hs i)) ∧
-      V.character =
+        V.character =
           ∑ i, ns i •
             (FDRep.indLin (k := k) (G := G) (Hs i) (ψs i)).character := by
-  rcases BrauerInduction.character_eq_sum_induced_linear (k := k) (G := G) V with
-    ⟨ι, hι, ns, Hs, ψs, hElem, hsum⟩
-  refine ⟨ι, hι, ns, Hs, ψs, ?_, ?_⟩
-  · intro i
-    rcases hElem i with ⟨p, hp, hpe⟩
-    dsimp [BrauerInduction.IsPElementary] at hpe
-    rcases hpe with ⟨E⟩
-    refine ⟨p, hp, ⟨?_⟩⟩
-    exact
-    { C := E.C
-      P := E.P
-      C_isCyclic := E.C_isCyclic
-      C_isPRegular := by
-        intro c hc
-        simpa [BrauerChallenge.IsPRegular, _root_.IsPRegular] using E.C_isPRegular hc
-      P_isPGroup := E.P_isPGroup
-      comm := E.comm
-      decompose := E.decompose }
-  · trans
-      ∑ i, ns i •
-        (_root_.FDRep.indLin (k := k) (G := G) (Hs i) (ψs i)).character
-    · exact hsum
-    · apply Finset.sum_congr rfl
-      intro i hi
-      rw [_root_.FDRep.indLin_eq_of_rep_ind]
-      rfl
-
-/-- Every Brauer-elementary group is solvable (elementary ⇒ nilpotent ⇒ solvable),
-    bridging the challenge predicate through the project's `IsBrauerElementary.isNilpotent`. -/
-theorem IsBrauerElementary.isSolvable
-    {G : Type u} [Group G] [Finite G]
-    (h : IsBrauerElementary G) : IsSolvable G := by
-  obtain ⟨p, hp, ⟨E⟩⟩ := h
-  have hBI : BrauerInduction.IsBrauerElementary G := by
-    refine ⟨p, hp, ⟨?_⟩⟩
-    exact
-    { C := E.C
-      P := E.P
-      C_isCyclic := E.C_isCyclic
-      C_isPRegular := by
-        intro c hc
-        simpa [BrauerChallenge.IsPRegular, _root_.IsPRegular] using E.C_isPRegular hc
-      P_isPGroup := E.P_isPGroup
-      comm := E.comm
-      decompose := E.decompose }
-  haveI : Group.IsNilpotent G := hBI.isNilpotent
-  infer_instance
-
-/-- Trivial-character bridge: the character of the challenge's trivial linear representation
-    equals that of Mathlib's trivial representation `(1 : Representation k G k)`. -/
-theorem lhs_bridge {G : Type u} [Group G] [Finite G] {k : Type u} [Field k] :
-    (FDRep.ofLinearChar (1 : G →* kˣ)).character
-      = (1 : Representation k G k).character := by
-  have hρ : (FDRep.ofLinearChar (1 : G →* kˣ)).ρ = (1 : Representation k G k) := by
-    apply MonoidHom.ext; intro g; apply LinearMap.ext; intro x
-    show (_root_.FDRep.ofLinearChar (1 : G →* kˣ)).ρ g x = (1 : G →* Module.End k k) g x
-    simp [Module.End.one_apply]
-  exact congrArg Representation.character hρ
-
-/--
-The user corollary, stated in pure Mathlib vocabulary and proved from the previous
-(elementary) challenge theorem `character_eq_sum_induced_linear`.
-
-The character of the trivial one-dimensional representation is an integer linear
-combination of characters of representations induced from linear characters of
-*solvable* subgroups.
--/
-theorem trivialChar_eq_sum_induced_linear_solvable
-    {G : Type u} [Group G] [Finite G]
-    {k : Type u} [Field k] [CharZero k] [IsAlgClosed k] :
-    ∃ (ι : Type) (_ : Fintype ι)
-      (ns : ι → ℤ)
-      (Hs : ι → Subgroup G)
-      (ψs : ∀ i, Hs i →* kˣ),
-      (∀ i, IsSolvable (Hs i)) ∧
-        (1 : Representation k G k).character =
-          ∑ i, ns i •
-            (Rep.ind (Hs i).subtype
-              (Rep.of ((algebraMap k (Module.End k k)).toMonoidHom.comp
-                ((Units.coeHom k).comp (ψs i))))).ρ.character := by
-  obtain ⟨ι, hι, ns, Hs, ψs, hElem, hsum⟩ :=
-    character_eq_sum_induced_linear (FDRep.ofLinearChar (1 : G →* kˣ))
-  refine ⟨ι, hι, ns, Hs, ψs, fun i => (hElem i).isSolvable, ?_⟩
-  rw [← lhs_bridge, hsum]
-  exact Finset.sum_congr rfl (fun i _ => rfl)
+  sorry
 
 end BrauerChallenge

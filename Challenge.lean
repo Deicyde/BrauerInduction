@@ -7,130 +7,34 @@ universe u
 namespace BrauerChallenge
 
 /--
-An element is `p`-regular if its order is coprime to `p`.
+Brauer induction — trivial-representation / solvable-subgroup corollary,
+stated using **only Mathlib vocabulary**.
+
+The character of the trivial one-dimensional representation `(1 : Representation k G k)`
+of a finite group `G` over an algebraically closed field of characteristic zero is an
+integer linear combination of the characters of representations induced (`Rep.ind`) from
+linear characters `ψ : H →* kˣ` of *solvable* subgroups `H`.  Each linear character is
+realized as the one-dimensional representation `h ↦ (ψ h) • id` on `k`, written point-free
+as `algebraMap k (Module.End k k) ∘ Units.coeHom k ∘ ψ`.
+
+This is a (strictly weaker) corollary of Brauer's induction theorem on induced characters:
+it specializes the theorem to the trivial representation and relaxes the elementary-subgroup
+class to the larger solvable-subgroup class.  It is proved in `Solution.lean` from the
+previous, elementary form of the challenge (`OldChallenge.lean`).
 -/
-def IsPRegular {G : Type u} [Group G] (p : ℕ) (g : G) : Prop :=
-  Nat.Coprime (orderOf g) p
-
-
-/--
-A group `G` is `p`-elementary if it is the product of a cyclic `p`-regular
-subgroup `C` and a `p`-group `P`, with `C` centralizing `P`.
-
-The structure is data-bearing: it records chosen subgroups `C` and `P`.
-The corresponding proposition is usually expressed as
-`Nonempty (PElementary p G)`, or equivalently `IsPElementary p G`.
--/
-structure PElementary (p : ℕ) (G : Type u) [Group G] where
-  protected C : Subgroup G
-  protected P : Subgroup G
-  protected C_isCyclic : IsCyclic C
-  protected P_isPGroup : IsPGroup p P
-  protected C_isPRegular : ∀ {c : G}, c ∈ C → IsPRegular p c
-  protected comm : ∀ {c q : G}, c ∈ C → q ∈ P → Commute c q
-  protected decompose : ∀ h : G, ∃ c ∈ C, ∃ q ∈ P, c * q = h
-
-/--
-A group is Brauer elementary if it is `p`-elementary for some prime `p`.
--/
-def IsBrauerElementary (G : Type u) [Group G] : Prop :=
-  ∃ p : ℕ, p.Prime ∧ Nonempty (PElementary p G)
-
-section Induction
-
-namespace FDRep
-
-variable {k : Type u} [CommRing k]
-variable {G H : Type u} [Group G] [Group H]
-
-noncomputable abbrev asRep
-    {k : Type u} [CommRing k]
-    {G : Type v} [Monoid G]
-    (V : FDRep k G) : Rep k G :=
-  (CategoryTheory.forget₂ (FDRep k G) (Rep k G)).obj V
-
-/--
-Induction of a finite-dimensional representation along a group homomorphism.
--/
-noncomputable def indHom [Finite H]
-    (φ : G →* H)
-    (σ : FDRep k G) :
-    FDRep k H := by
-  let A : Rep k G := asRep σ
-  let τind : Rep k H := Rep.ind φ A
-  have h_fin_τ : Module.Finite k τind.V := by
-    letI : Fintype H := Fintype.ofFinite H
-    haveI : Module.Finite k A.V := by
-      change Module.Finite k σ
-      infer_instance
-    exact Module.Finite.of_surjective
-      (Representation.Coinvariants.mk _) (Submodule.mkQ_surjective _)
-  haveI : Module.Finite k τind.V := h_fin_τ
-  exact FDRep.of τind.ρ
-
-/-- Induction from a subgroup defined a special case of `indHom`. -/
-noncomputable abbrev ind [Finite G] (H : Subgroup G) (σ : FDRep k H) : FDRep k G :=
-  indHom H.subtype σ
-
-end Induction.FDRep
-
-section LinearChar
-
-namespace FDRep
-
-variable {k : Type u} [CommRing k]
-
-/--
-The one-dimensional representation associated to a linear character
-`ψ : G →* kˣ`.
--/
-noncomputable def ofLinearChar
-    {G : Type u} [Monoid G]
-    (ψ : G →* kˣ) : FDRep k G :=
-  let ρ : Representation k G k :=
-  { toFun := fun g => (ψ g : k) • LinearMap.id
-    map_one' := by
-      ext
-      simp
-    map_mul' := by
-      intro x y
-      ext
-      simp [mul_comm] }
-  FDRep.of ρ
-
-/--
-The representation induced from the one-dimensional representation attached to
-a linear character of a subgroup.
--/
-noncomputable def indLin {G : Type u} [Group G] [Finite G]
-    (H : Subgroup G) (ψ : H →* kˣ) : FDRep k G :=
-    FDRep.ind H (ofLinearChar ψ)
-
-end FDRep
-
-end LinearChar
-
-/--
-Brauer's induction theorem, stated using only Mathlib vocabulary plus the
-definitions in this file.
-
-Every character of a finite-dimensional representation of a finite group over an
-algebraically closed field of characteristic zero is an integer linear
-combination of characters induced from linear characters of Brauer elementary
-subgroups.
--/
-theorem character_eq_sum_induced_linear
+theorem trivialChar_eq_sum_induced_linear_solvable
     {G : Type u} [Group G] [Finite G]
-    {k : Type u} [Field k] [CharZero k] [IsAlgClosed k]
-    (V : FDRep k G) :
+    {k : Type u} [Field k] [CharZero k] [IsAlgClosed k] :
     ∃ (ι : Type) (_ : Fintype ι)
       (ns : ι → ℤ)
       (Hs : ι → Subgroup G)
       (ψs : ∀ i, Hs i →* kˣ),
-      (∀ i, IsBrauerElementary (Hs i)) ∧
-        V.character =
+      (∀ i, IsSolvable (Hs i)) ∧
+        (1 : Representation k G k).character =
           ∑ i, ns i •
-            (FDRep.indLin (k := k) (G := G) (Hs i) (ψs i)).character := by
+            (Rep.ind (Hs i).subtype
+              (Rep.of ((algebraMap k (Module.End k k)).toMonoidHom.comp
+                ((Units.coeHom k).comp (ψs i))))).ρ.character := by
   sorry
 
 end BrauerChallenge

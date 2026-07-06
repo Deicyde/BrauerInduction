@@ -23,4 +23,7 @@ name = "BrauerInduction"
 name = "Challenge"
 
 [[lean_lib]]
+name = "OldChallenge"
+
+[[lean_lib]]
 name = "Solution"
